@@ -296,37 +296,6 @@ setup() {
 EOF
 }
 
-@test "$test_tag Test SEV unencrypted container launch success" {
-  # Add key to KBS with policy measurement
-  add_key_to_kbs_db
-  
-  # Start the service/deployment/pod
-  esudo kubectl apply -f \
-    "${TESTS_REPO_DIR}/integration/kubernetes/confidential/fixtures/unencrypted-image-tests.yaml"
-  
-  # Retrieve pod name, wait for it to come up, retrieve pod ip
-  pod_name=$(esudo kubectl get pod -o wide | grep unencrypted-image-tests | awk '{print $1;}')
-  kubernetes_wait_for_pod_ready_state "$pod_name" 20
-  pod_ip=$(esudo kubectl get pod -o wide | grep unencrypted-image-tests | awk '{print $6;}')
-
-  print_service_info
-
-  # Look for SEV enabled in container dmesg output
-  sev_enabled=$(ssh -i ${SSH_KEY_FILE} \
-    -o "StrictHostKeyChecking no" \
-    -o "PasswordAuthentication=no" \
-    -t root@${pod_ip} \
-    'dmesg | grep SEV' || true)
-
-  if [ -z "$sev_enabled" ]; then
-    >&2 echo -e "${RED}KATA CC TEST - FAIL: SEV is NOT Enabled${NC}"
-    return 1
-  else
-    echo "DMESG REPORT: $sev_enabled"
-    echo -e "${GREEN}KATA CC TEST - PASS: SEV is Enabled${NC}"
-  fi
-}
-
 @test "$test_tag Test SEV encrypted container launch failure with INVALID measurement" {
   # update kata config to point to KBS
   # this test expects an invalid measurement, but we still update
@@ -368,6 +337,39 @@ EOF
     echo -e "${GREEN}TEST - PASS${NC}"
   fi
 }
+
+@test "$test_tag Test SEV unencrypted container launch success" {
+  # Add key to KBS with policy measurement
+  add_key_to_kbs_db
+  
+  # Start the service/deployment/pod
+  esudo kubectl apply -f \
+    "${TESTS_REPO_DIR}/integration/kubernetes/confidential/fixtures/unencrypted-image-tests.yaml"
+  
+  # Retrieve pod name, wait for it to come up, retrieve pod ip
+  pod_name=$(esudo kubectl get pod -o wide | grep unencrypted-image-tests | awk '{print $1;}')
+  kubernetes_wait_for_pod_ready_state "$pod_name" 20
+  pod_ip=$(esudo kubectl get pod -o wide | grep unencrypted-image-tests | awk '{print $6;}')
+
+  print_service_info
+
+  # Look for SEV enabled in container dmesg output
+  sev_enabled=$(ssh -i ${SSH_KEY_FILE} \
+    -o "StrictHostKeyChecking no" \
+    -o "PasswordAuthentication=no" \
+    -t root@${pod_ip} \
+    'dmesg | grep SEV' || true)
+
+  if [ -z "$sev_enabled" ]; then
+    >&2 echo -e "${RED}KATA CC TEST - FAIL: SEV is NOT Enabled${NC}"
+    return 1
+  else
+    echo "DMESG REPORT: $sev_enabled"
+    echo -e "${GREEN}KATA CC TEST - PASS: SEV is Enabled${NC}"
+  fi
+}
+
+
 
 @test "$test_tag Test SEV encrypted container launch success with NO measurement" {
 
