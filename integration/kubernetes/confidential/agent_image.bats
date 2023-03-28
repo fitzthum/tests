@@ -8,18 +8,22 @@ load "${BATS_TEST_DIRNAME}/lib.sh"
 load "${BATS_TEST_DIRNAME}/../../confidential/lib.sh"
 
 # Images used on the tests.
+image_base="ghcr.io/confidential-containers/test-container"
+
 ## Cosign
-image_cosigned="quay.io/kata-containers/confidential-containers:cosign-signed"
-image_cosigned_other="quay.io/kata-containers/confidential-containers:cosign-signed-key2"
+image_cosigned="${image_base}:cosign-signed"
+image_cosigned_other="${image_base}:cosign-signed-wrong-key"
+
+# Handle non-x86 images
+image_suffix=""
+if [ "$(uname -m)" != "x86_64" ]; then
+	image_suffix="-$(uname -m)"
+fi
 
 ## Simple Signing
-tag_suffix=""
-if [ "$(uname -m)" != "x86_64" ]; then
-	tag_suffix="-$(uname -m)"
-fi
-image_simple_signed="quay.io/kata-containers/confidential-containers:signed${tag_suffix}"
-image_signed_protected_other="quay.io/kata-containers/confidential-containers:other_signed${tag_suffix}"
-image_unsigned_protected="quay.io/kata-containers/confidential-containers:unsigned${tag_suffix}"
+image_simple_signed="${image_base}${image_suffix}:signed"
+image_signed_protected_other="${image_base}${image_suffix}:signed-wrong-key"
+image_unsigned_protected="${image_base}${image_suffix}:unsigned"
 image_unsigned_unprotected="quay.io/prometheus/busybox:latest"
 
 ## Authenticated Image
