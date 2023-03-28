@@ -5,7 +5,7 @@
 metadata:
   name: kata-cc-busybox-signed-other
 image:
-  image: quay.io/kata-containers/confidential-containers:other_signed
+  image: ghcr.io/confidential-containers/test-container:signed-wrong-key
 command:
 - top
 log_path: kata-cc.0.log

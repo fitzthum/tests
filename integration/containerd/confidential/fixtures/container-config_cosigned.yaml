@@ -5,7 +5,7 @@
 metadata:
   name: kata-cc-busybox-cosigned
 image:
-  image: quay.io/kata-containers/confidential-containers:cosign-signed
+  image: ghcr.io/confidential-containers/test-container:cosign-signed
 command:
 - top
 log_path: kata-cc.0.log

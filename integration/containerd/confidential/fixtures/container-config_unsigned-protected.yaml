@@ -5,7 +5,7 @@
 metadata:
   name: kata-cc-busybox-unsigned
 image:
-  image: quay.io/kata-containers/confidential-containers:unsigned
+  image: ghcr.io/confidential-containers/test-container:unsigned
 command:
 - top
 log_path: kata-cc.0.log
