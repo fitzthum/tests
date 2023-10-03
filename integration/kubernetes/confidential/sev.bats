@@ -89,7 +89,9 @@ setup_file() {
   kubernetes_generate_service_yaml "${TEST_DIR}/sev-es-encrypted.yaml" "${IMAGE_REPO}:multi-arch-encrypted"
   kubernetes_yaml_set_annotation "${TEST_DIR}/sev-es-encrypted.yaml" "io.katacontainers.config.pre_attestation.uri" "${kbs_uri}"
   kubernetes_yaml_set_annotation "${TEST_DIR}/sev-es-encrypted.yaml" "io.katacontainers.config.sev.policy" "7"
+
 }
+
 
 teardown_file() {
   # Allow to not destroy the environment if you are developing/debugging tests
@@ -116,6 +118,10 @@ setup() {
 
   # Delete any previous data in the simple-kbs database
   simple_kbs_delete_data
+
+  # remove the test images from the local image cache
+  esudo sudo crictl -r unix:///run/containerd/containerd.sock rmi 3bf7ec31ad5b7 || true
+  esudo sudo crictl -r unix:///run/containerd/containerd.sock rmi b3d172cd5c0f1 || true
 }
 
 
